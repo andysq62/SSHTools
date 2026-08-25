@@ -26,10 +26,6 @@ ehthumbs.db
 Desktop.ini
 .DS_Store
 
-# --- Pending redaction (contains internal host/account names) ---
-# Remove this line once the internal values in the doc have been obfuscated.
-docs/openssh10-sftp-chroot-pubkey-troubleshooting.md
-
 # --- Scratch / backup files ---
 *.bak
 *.tmp
