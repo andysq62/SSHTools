@@ -1,41 +1,36 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
+# -ForEach data must exist at discovery time, so it is built here (and again in
+# BeforeAll for the run phase). The manifest's FunctionsToExport is the source of truth.
+BeforeDiscovery {
+    $ManifestPath = Join-Path (Split-Path -Parent $PSScriptRoot) 'SSHTools.psd1'
+    $ExpectedFunctions = @((Import-PowerShellDataFile -Path $ManifestPath).FunctionsToExport)
+}
+
 BeforeAll {
     $script:RepoRoot     = Split-Path -Parent $PSScriptRoot
-    $script:ManifestPath = Join-Path $RepoRoot 'SSHTools.psd1'
-    Import-Module $ManifestPath -Force
-
-    $script:ExpectedFunctions = @(
-        'Get-OpenSSHInstallation'
-        'Install-OpenSSH'
-        'Get-OpenSSHFirewallRule'
-        'Set-OpenSSHFirewallRule'
-        'Test-SSHDListening'
-        'Backup-OpenSSHConfiguration'
-        'Test-OpenSSHStrictModesPath'
-        'Repair-OpenSSHPathPermission'
-        'Restart-SSHDService'
-    )
+    $script:ManifestPath = Join-Path $script:RepoRoot 'SSHTools.psd1'
+    Import-Module $script:ManifestPath -Force
+    $script:ExpectedFunctions = @((Import-PowerShellDataFile -Path $script:ManifestPath).FunctionsToExport)
 }
 
 Describe 'SSHTools module' {
 
     Context 'Manifest' {
         It 'is a valid module manifest' {
-            { Test-ModuleManifest -Path $ManifestPath -ErrorAction Stop } | Should -Not -Throw
+            { Test-ModuleManifest -Path $script:ManifestPath -ErrorAction Stop } | Should -Not -Throw
         }
 
-        It 'exports exactly the expected functions in the manifest' {
-            $manifest = Test-ModuleManifest -Path $ManifestPath
-            $manifest.ExportedFunctions.Keys | Sort-Object |
-                Should -Be ($ExpectedFunctions | Sort-Object)
+        It 'declares an explicit list of functions to export (no wildcard)' {
+            $script:ExpectedFunctions | Should -Not -BeNullOrEmpty
+            $script:ExpectedFunctions | Should -Not -Contain '*'
         }
     }
 
     Context 'Loaded module' {
-        It 'exports exactly the expected functions at runtime' {
+        It 'runtime exports match the manifest declaration' {
             (Get-Command -Module SSHTools -CommandType Function).Name | Sort-Object |
-                Should -Be ($ExpectedFunctions | Sort-Object)
+                Should -Be ($script:ExpectedFunctions | Sort-Object)
         }
 
         It 'does not export the private dispatcher' {
@@ -46,7 +41,7 @@ Describe 'SSHTools module' {
 
     Context 'Source files' {
         It 'every .ps1 parses without syntax errors' {
-            $files = Get-ChildItem -Path (Join-Path $RepoRoot 'Public'), (Join-Path $RepoRoot 'Private') -Filter *.ps1
+            $files = Get-ChildItem -Path (Join-Path $script:RepoRoot 'Public'), (Join-Path $script:RepoRoot 'Private') -Filter *.ps1
             foreach ($file in $files) {
                 $errors = $null
                 [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$null, [ref]$errors) | Out-Null
@@ -55,7 +50,7 @@ Describe 'SSHTools module' {
         }
 
         It 'defines one public function per file matching the file name' {
-            Get-ChildItem -Path (Join-Path $RepoRoot 'Public') -Filter *.ps1 | ForEach-Object {
+            Get-ChildItem -Path (Join-Path $script:RepoRoot 'Public') -Filter *.ps1 | ForEach-Object {
                 Get-Command -Module SSHTools -Name $_.BaseName -ErrorAction SilentlyContinue |
                     Should -Not -BeNullOrEmpty -Because "$($_.Name) should define function $($_.BaseName)"
             }
@@ -67,7 +62,7 @@ Describe 'SSHTools module' {
             (Get-Help $_ -ErrorAction SilentlyContinue).Synopsis.Trim() | Should -Not -BeNullOrEmpty
         }
 
-        It '<_> supports -ComputerName and -Session' -ForEach $ExpectedFunctions {
+        It '<_> supports -ComputerName, -Session, and -Credential' -ForEach $ExpectedFunctions {
             $params = (Get-Command $_).Parameters
             $params.Keys | Should -Contain 'ComputerName'
             $params.Keys | Should -Contain 'Session'
@@ -75,10 +70,9 @@ Describe 'SSHTools module' {
         }
 
         It '<_> keeps ComputerName and Session in different parameter sets' -ForEach $ExpectedFunctions {
-            $cmd            = Get-Command $_
-            $computerSets   = $cmd.Parameters['ComputerName'].ParameterSets.Keys
-            $sessionSets    = $cmd.Parameters['Session'].ParameterSets.Keys
-            # No parameter set should allow both at once.
+            $cmd          = Get-Command $_
+            $computerSets = $cmd.Parameters['ComputerName'].ParameterSets.Keys
+            $sessionSets  = $cmd.Parameters['Session'].ParameterSets.Keys
             ($computerSets | Where-Object { $sessionSets -contains $_ }) | Should -BeNullOrEmpty
         }
     }

@@ -20,7 +20,9 @@ jobs:
         shell: pwsh
         run: |
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-          Install-Module Pester           -MinimumVersion 5.5.0 -Force -SkipPublisherCheck
+          # Pin Pester to the 5.x line the suite is written and validated against
+          # (the runner preinstalls Pester 6, whose discovery rules differ).
+          Install-Module Pester -MinimumVersion 5.5.0 -MaximumVersion 5.99.99 -Force -SkipPublisherCheck
           Install-Module PSScriptAnalyzer -MinimumVersion 1.22.0 -Force
 
       - name: Validate module manifest
@@ -42,6 +44,8 @@ jobs:
       - name: Run Pester
         shell: pwsh
         run: |
+          Import-Module Pester -MinimumVersion 5.5.0 -MaximumVersion 5.99.99 -Force
+          "Using Pester $((Get-Module Pester).Version)" | Write-Host
           $config = New-PesterConfiguration
           $config.Run.Path              = './Tests'
           $config.Run.Exit              = $true
