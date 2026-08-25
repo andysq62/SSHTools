@@ -20,8 +20,16 @@ all happen on the machine you point at.
 
 ## Install
 
-Copy this repo's contents into a folder named `SSHTools` on `$env:PSModulePath` (e.g.
-`C:\Program Files\WindowsPowerShell\Modules\SSHTools`), or import it directly from a clone:
+Run the build script, which validates (PSScriptAnalyzer + Pester) and then installs the
+module into your PSModulePath for both PowerShell editions:
+
+```powershell
+.\build.ps1                 # current user, Windows PowerShell + PowerShell 7
+.\build.ps1 -SkipTests      # deploy without running the suite
+.\build.ps1 -Edition Core -WhatIf   # preview where it would land
+```
+
+Or import it directly from a clone without installing:
 
 ```powershell
 Import-Module .\SSHTools.psd1
