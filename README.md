@@ -66,6 +66,19 @@ State-changing functions (`Install-OpenSSH`, `Set-OpenSSHFirewallRule`,
 `Backup-OpenSSHConfiguration`, `Repair-OpenSSHPathPermission`, `Restart-SSHDService`) support
 `-WhatIf` and `-Confirm`.
 
+## Tests
+
+[Pester](https://pester.dev) v5 tests live in `Tests/` — one file per function, plus the
+manifest and the dispatcher. They mock the remoting layer, so they run offline and change
+nothing on the machine:
+
+```powershell
+Invoke-Pester -Path .\Tests
+```
+
+One test (the `-Session` routing branch) needs a loopback PSSession and self-skips where
+WinRM is not configured.
+
 ## Background
 
 The chroot / StrictModes / firewall-profile issues these functions target are documented in
