@@ -9,7 +9,7 @@ repo into proper functions.
 Every function can target:
 
 | Target | How |
-|---|---|
+| --- | --- |
 | The local machine | call with no target parameters |
 | A remote computer | `-ComputerName <name>` (optionally `-Credential`) |
 | An established session | `-Session <PSSession>` |
@@ -39,7 +39,7 @@ Import-Module .\SSHTools.psd1
 ## Functions
 
 | Function | Purpose | Replaces |
-|---|---|---|
+| --- | --- | --- |
 | `Get-OpenSSHInstallation` | Detect in-box vs. installed OpenSSH, versions, client on PATH, sshd service state | `Get-OpenSSHType`, `Get-OpenSSHVersion` |
 | `Install-OpenSSH` | Download the latest Win32-OpenSSH MSI, report SHA256, optionally install | `Get-OpenSSH` |
 | `Get-OpenSSHFirewallRule` | List OpenSSH firewall rules **with their profile scope** | `Get-SSHFirewallRule`, `Get-OpenSSHFirewallProfile` |
@@ -54,20 +54,20 @@ Import-Module .\SSHTools.psd1
 
 ```powershell
 # What OpenSSH is on the SFTP server, and is sshd listening?
-Get-OpenSSHInstallation -ComputerName coltst19xfer
-Test-SSHDListening       -ComputerName coltst19xfer
+Get-OpenSSHInstallation -ComputerName server01
+Test-SSHDListening       -ComputerName server01
 
 # Firewall rule scoped wrong? Inspect, then fix (a Private-only rule won't match a domain NIC).
-Get-OpenSSHFirewallRule -ComputerName coltst19xfer
-Set-OpenSSHFirewallRule -ComputerName coltst19xfer -Profile Domain,Private
+Get-OpenSSHFirewallRule -ComputerName server01
+Set-OpenSSHFirewallRule -ComputerName server01 -Profile Domain,Private
 
 # Diagnose the "silent pubkey rejection" chroot case, then remediate.
-Test-OpenSSHStrictModesPath  -ComputerName coltst19xfer -Path 'D:\AU\Data'
-Repair-OpenSSHPathPermission -ComputerName coltst19xfer -Path 'D:\' -Recurse
-Restart-SSHDService          -ComputerName coltst19xfer
+Test-OpenSSHStrictModesPath  -ComputerName server01 -Path 'D:\Data'
+Repair-OpenSSHPathPermission -ComputerName server01 -Path 'D:\' -Recurse
+Restart-SSHDService          -ComputerName server01
 
 # Reuse one session for a whole workflow.
-$s = New-PSSession coltst19xfer
+$s = New-PSSession server01
 Backup-OpenSSHConfiguration -Session $s -Destination D:\Backups\ssh
 Get-OpenSSHInstallation     -Session $s
 Remove-PSSession $s
