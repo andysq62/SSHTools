@@ -1,5 +1,7 @@
 # SSHTools
 
+[![CI](https://github.com/andysq62/SSHTools/actions/workflows/ci.yml/badge.svg)](https://github.com/andysq62/SSHTools/actions/workflows/ci.yml)
+
 A PowerShell module for installing, configuring, and troubleshooting **Win32-OpenSSH** (`sshd`)
 on Windows. It packages the ad-hoc administration and SFTP-chroot troubleshooting steps from this
 repo into proper functions.
