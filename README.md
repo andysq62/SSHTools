@@ -81,5 +81,8 @@ WinRM is not configured.
 
 ## Background
 
-The chroot / StrictModes / firewall-profile issues these functions target are documented in
-[`docs/openssh10-sftp-chroot-pubkey-troubleshooting.md`](docs/openssh10-sftp-chroot-pubkey-troubleshooting.md).
+These functions come out of a real Win32-OpenSSH 10 SFTP troubleshooting engagement — a
+chroot/SFTP account whose public-key auth failed silently due to a mis-scoped firewall rule,
+over-broad NTFS permissions tripping `StrictModes`, and an `AuthorizedKeysFile` resolving
+inside the chroot jail. A detailed write-up of that investigation is kept with the project but
+is not published here yet, pending redaction of internal host and account names.
