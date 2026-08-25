@@ -15,36 +15,50 @@
     Only the shipping files are deployed (manifest, root module, Public\, Private\,
     README.md) -- tests, CI config, and docs are left behind.
 
-.PARAMETER Scope
-    CurrentUser (default) installs under your Documents; AllUsers installs under
-    Program Files and requires an elevated session.
+.PARAMETER Path
+    Module root to deploy into. Defaults to C:\Scripts\Modules (a custom folder on
+    the PSModulePath). The module lands at <Path>\SSHTools\<version>. Use this to target
+    a personal module folder instead of the standard per-user locations.
 
 .PARAMETER Edition
-    Which PowerShell edition's module path to target:
-      Desktop = Windows PowerShell 5.1, Core = PowerShell 7+, Both (default) = both.
+    Deploy into the standard per-edition module path instead of -Path:
+      Desktop = Windows PowerShell 5.1, Core = PowerShell 7+, Both = both.
+
+.PARAMETER Scope
+    With -Edition: CurrentUser (default) installs under your Documents; AllUsers installs
+    under Program Files and requires an elevated session.
 
 .PARAMETER SkipTests
     Skip the PSScriptAnalyzer + Pester validation step and deploy immediately.
 
 .EXAMPLE
     .\build.ps1
-    Validate, then install for the current user into both PowerShell editions.
+    Validate, then install into C:\Scripts\Modules.
+
+.EXAMPLE
+    .\build.ps1 -Path D:\MyModules
+    Deploy into a different custom module folder.
 
 .EXAMPLE
     .\build.ps1 -Edition Core -WhatIf
-    Show where it would deploy for PowerShell 7 without copying anything.
+    Show where it would deploy into the PowerShell 7 per-user path, copying nothing.
 
 .EXAMPLE
     .\build.ps1 -SkipTests
     Deploy without running the test suite.
 #>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'CustomPath')]
 param(
+    [Parameter(ParameterSetName = 'CustomPath')]
+    [string]$Path = 'C:\Scripts\Modules',
+
+    [Parameter(ParameterSetName = 'PSModulePath', Mandatory)]
+    [ValidateSet('Desktop', 'Core', 'Both')]
+    [string]$Edition,
+
+    [Parameter(ParameterSetName = 'PSModulePath')]
     [ValidateSet('CurrentUser', 'AllUsers')]
     [string]$Scope = 'CurrentUser',
-
-    [ValidateSet('Desktop', 'Core', 'Both')]
-    [string]$Edition = 'Both',
 
     [switch]$SkipTests
 )
@@ -92,25 +106,40 @@ if (-not $SkipTests) {
 }
 
 # --- 2. Resolve destination(s) ----------------------------------------------
-if ($Scope -eq 'AllUsers') {
-    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-        ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if (-not $isAdmin) { throw "-Scope AllUsers requires an elevated (Run as Administrator) session." }
-}
-
-$docs     = [Environment]::GetFolderPath('MyDocuments')   # OneDrive-redirection aware
-$editions = if ($Edition -eq 'Both') { @('Desktop', 'Core') } else { @($Edition) }
-
-$targets = foreach ($ed in $editions) {
-    $base = switch ("$ed|$Scope") {
-        'Desktop|CurrentUser' { Join-Path $docs 'WindowsPowerShell\Modules' }
-        'Desktop|AllUsers' { Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules' }
-        'Core|CurrentUser' { Join-Path $docs 'PowerShell\Modules' }
-        'Core|AllUsers' { Join-Path $env:ProgramFiles 'PowerShell\Modules' }
+if ($PSCmdlet.ParameterSetName -eq 'CustomPath') {
+    if (-not (Test-Path -LiteralPath $Path)) {
+        Write-Warning "Module root '$Path' does not exist yet; it will be created."
     }
-    [pscustomobject]@{
-        Edition = $ed
-        Path    = Join-Path $base "$moduleName\$version"
+    $onPath = ($env:PSModulePath -split ';' | ForEach-Object { $_.TrimEnd('\') }) -contains $Path.TrimEnd('\')
+    if (-not $onPath) {
+        Write-Warning "'$Path' is not in `$env:PSModulePath; the module will deploy there but won't be auto-discovered until you add it."
+    }
+    $targets = @([pscustomobject]@{
+            Edition = 'Custom'
+            Path    = Join-Path $Path "$moduleName\$version"
+        })
+}
+else {
+    if ($Scope -eq 'AllUsers') {
+        $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+            ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+        if (-not $isAdmin) { throw "-Scope AllUsers requires an elevated (Run as Administrator) session." }
+    }
+
+    $docs     = [Environment]::GetFolderPath('MyDocuments')   # OneDrive-redirection aware
+    $editions = if ($Edition -eq 'Both') { @('Desktop', 'Core') } else { @($Edition) }
+
+    $targets = foreach ($ed in $editions) {
+        $base = switch ("$ed|$Scope") {
+            'Desktop|CurrentUser' { Join-Path $docs 'WindowsPowerShell\Modules' }
+            'Desktop|AllUsers' { Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules' }
+            'Core|CurrentUser' { Join-Path $docs 'PowerShell\Modules' }
+            'Core|AllUsers' { Join-Path $env:ProgramFiles 'PowerShell\Modules' }
+        }
+        [pscustomobject]@{
+            Edition = $ed
+            Path    = Join-Path $base "$moduleName\$version"
+        }
     }
 }
 

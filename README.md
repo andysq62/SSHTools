@@ -21,12 +21,13 @@ all happen on the machine you point at.
 ## Install
 
 Run the build script, which validates (PSScriptAnalyzer + Pester) and then installs the
-module into your PSModulePath for both PowerShell editions:
+module into your PSModulePath:
 
 ```powershell
-.\build.ps1                 # current user, Windows PowerShell + PowerShell 7
-.\build.ps1 -SkipTests      # deploy without running the suite
-.\build.ps1 -Edition Core -WhatIf   # preview where it would land
+.\build.ps1                     # deploy into C:\Scripts\Modules (default -Path)
+.\build.ps1 -Path D:\MyModules  # a different custom module folder
+.\build.ps1 -Edition Both       # standard per-user paths (WinPS 5.1 + PS 7)
+.\build.ps1 -SkipTests          # deploy without running the suite
 ```
 
 Or import it directly from a clone without installing:
