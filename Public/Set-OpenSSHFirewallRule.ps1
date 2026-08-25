@@ -35,6 +35,8 @@ function Set-OpenSSHFirewallRule {
     .EXAMPLE
         Set-OpenSSHFirewallRule -Profile Domain,Private,Public -Enabled $true
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidAssignmentToAutomaticVariable', '',
+        Justification = 'Mirrors Set-NetFirewallRule -Profile. The bound parameter shadows the automatic $Profile, which this function never reads.')]
     [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Computer')]
     param(
         [string]$DisplayName = 'OpenSSH SSH Server Preview (sshd)',

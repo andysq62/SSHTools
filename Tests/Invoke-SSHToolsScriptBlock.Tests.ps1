@@ -11,7 +11,9 @@ BeforeAll {
         $opt = New-PSSessionOption -OpenTimeout 3000
         $script:LocalSession = New-PSSession -ComputerName localhost -SessionOption $opt -ErrorAction Stop
     }
-    catch { }
+    catch {
+        Write-Verbose "Loopback PSSession unavailable; -Session routing test will skip. $_"
+    }
     $script:NoSession = -not $script:LocalSession
 }
 

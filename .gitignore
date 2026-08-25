@@ -1,0 +1,33 @@
+# --- Test & analysis output ---
+testResults.xml
+*.testresults.xml
+coverage.xml
+coverage*.json
+/.pester/
+
+# --- Build / packaging output ---
+Output/
+BuildOutput/
+dist/
+*.nupkg
+
+# --- Local Claude Code settings ---
+.claude/settings.local.json
+
+# --- Editor / IDE ---
+.vs/
+.vscode/
+*.suo
+*.user
+
+# --- OS cruft ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Scratch / backup files ---
+*.bak
+*.tmp
+*.log
+*~

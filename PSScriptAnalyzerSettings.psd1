@@ -1,0 +1,12 @@
+@{
+    # Rules excluded because they only fire on the Pester test scaffolding, where the
+    # usage is deliberate. The shipping module source (Public/, Private/) does not trip
+    # either rule.
+    ExcludeRules = @(
+        # Tests pass literal computer names such as 'srv1' to exercise -ComputerName routing.
+        'PSAvoidUsingComputerNameHardcoded'
+
+        # Tests fabricate throwaway PSCredential objects for parameter-forwarding assertions.
+        'PSAvoidUsingConvertToSecureStringWithPlainText'
+    )
+}

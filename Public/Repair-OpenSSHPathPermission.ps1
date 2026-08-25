@@ -60,10 +60,10 @@ function Repair-OpenSSHPathPermission {
 
         if (-not (Test-Path -LiteralPath $Path)) { throw "Path not found: $Path" }
 
-        $args = @($Path, '/remove:g', $Identity, '/C')
-        if ($Recurse) { $args += '/T' }
+        $icaclsArgs = @($Path, '/remove:g', $Identity, '/C')
+        if ($Recurse) { $icaclsArgs += '/T' }
 
-        $output   = & icacls.exe @args 2>&1
+        $output   = & icacls.exe @icaclsArgs 2>&1
         $exitCode = $LASTEXITCODE
 
         [pscustomobject]@{
