@@ -17,7 +17,7 @@ function Restart-SSHDService {
         Credential used when connecting with -ComputerName.
 
     .EXAMPLE
-        Restart-SSHDService -ComputerName coltst19xfer
+        Restart-SSHDService -ComputerName server01
     #>
     [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Computer')]
     param(

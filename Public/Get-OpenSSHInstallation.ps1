@@ -9,8 +9,6 @@ function Get-OpenSSHInstallation {
         (under %ProgramFiles%\OpenSSH), returning the file version of each sshd.exe
         found, the ssh.exe currently resolved on PATH, and the state of the sshd service.
 
-        Replaces the Get-OpenSSHType and Get-OpenSSHVersion snippets.
-
     .PARAMETER ComputerName
         One or more remote computers to query. Omit to query the local machine.
 
@@ -24,10 +22,10 @@ function Get-OpenSSHInstallation {
         Get-OpenSSHInstallation
 
     .EXAMPLE
-        Get-OpenSSHInstallation -ComputerName coltst19xfer
+        Get-OpenSSHInstallation -ComputerName server01
 
     .EXAMPLE
-        $s = New-PSSession coltst19xfer; Get-OpenSSHInstallation -Session $s
+        $s = New-PSSession server01; Get-OpenSSHInstallation -Session $s
     #>
     [CmdletBinding(DefaultParameterSetName = 'Computer')]
     param(

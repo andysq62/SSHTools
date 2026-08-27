@@ -27,7 +27,7 @@ function Test-OpenSSHStrictModesPath {
         Credential used when connecting with -ComputerName.
 
     .EXAMPLE
-        Test-OpenSSHStrictModesPath -Path 'D:\AU\Data' -ComputerName coltst19xfer
+        Test-OpenSSHStrictModesPath -Path 'D:\Data' -ComputerName server01
 
     .OUTPUTS
         One object per offending ACE. No output means the path chain is clean.

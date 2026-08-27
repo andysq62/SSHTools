@@ -12,8 +12,6 @@ function Install-OpenSSH {
         remote computer installs OpenSSH on that computer. The target must have outbound
         internet access to reach github.com.
 
-        Replaces the Get-OpenSSH snippet.
-
     .PARAMETER DownloadOnly
         Download and hash the MSI but do not install it. The downloaded path and hash
         are returned so you can verify SHA256 against the releases page before installing.
@@ -31,7 +29,7 @@ function Install-OpenSSH {
         Install-OpenSSH -DownloadOnly
 
     .EXAMPLE
-        Install-OpenSSH -ComputerName coltst19xfer -Confirm:$false
+        Install-OpenSSH -ComputerName server01 -Confirm:$false
     #>
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High', DefaultParameterSetName = 'Computer')]
     param(

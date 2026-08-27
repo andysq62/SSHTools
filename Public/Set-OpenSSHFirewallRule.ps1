@@ -8,8 +8,6 @@ function Set-OpenSSHFirewallRule {
         standard Win32-OpenSSH server rule and applies it to the Domain and Private profiles,
         which resolves the common case of a Private-only rule failing to match a domain NIC.
 
-        Replaces the Set-OpenSSHFirewallRule snippet.
-
     .PARAMETER DisplayName
         Exact display name of the rule to modify.
         Defaults to "OpenSSH SSH Server Preview (sshd)".
@@ -30,7 +28,7 @@ function Set-OpenSSHFirewallRule {
         Credential used when connecting with -ComputerName.
 
     .EXAMPLE
-        Set-OpenSSHFirewallRule -ComputerName coltst19xfer
+        Set-OpenSSHFirewallRule -ComputerName server01
 
     .EXAMPLE
         Set-OpenSSHFirewallRule -Profile Domain,Private,Public -Enabled $true
