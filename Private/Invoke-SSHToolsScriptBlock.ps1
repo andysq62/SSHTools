@@ -47,5 +47,15 @@ function Invoke-SSHToolsScriptBlock {
     }
     # else: no target -> Invoke-Command runs the block in-process (localhost)
 
-    Invoke-Command @invokeParams
+    # When Invoke-Command runs over remoting (-ComputerName / -Session) it decorates
+    # every returned object with RunspaceId, PSComputerName, and PSShowComputerName.
+    # Our objects already carry their own ComputerName, so strip the remoting noise.
+    Invoke-Command @invokeParams | ForEach-Object {
+        if ($null -ne $_) {
+            foreach ($p in 'RunspaceId', 'PSComputerName', 'PSShowComputerName') {
+                $_.PSObject.Properties.Remove($p)
+            }
+        }
+        $_
+    }
 }
