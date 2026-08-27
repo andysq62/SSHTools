@@ -14,6 +14,7 @@
         'Get-OpenSSHFirewallRule'
         'Set-OpenSSHFirewallRule'
         'Test-SSHDListening'
+        'Get-OpenSSHStatusReport'
         'Backup-OpenSSHConfiguration'
         'Test-OpenSSHStrictModesPath'
         'Repair-OpenSSHPathPermission'
