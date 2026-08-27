@@ -9,8 +9,6 @@ function Test-SSHDListening {
         confirms the sshd service is actually bound and accepting connections, independent
         of firewall scope.
 
-        Replaces the Get-IsSSHDBoundToPort snippet.
-
     .PARAMETER Port
         TCP port to check. Defaults to 22.
 
@@ -27,7 +25,7 @@ function Test-SSHDListening {
         Test-SSHDListening
 
     .EXAMPLE
-        Test-SSHDListening -ComputerName coltst19xfer -Port 22
+        Test-SSHDListening -ComputerName server01 -Port 22
     #>
     [CmdletBinding(DefaultParameterSetName = 'Computer')]
     param(

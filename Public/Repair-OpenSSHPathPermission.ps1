@@ -10,7 +10,7 @@ function Repair-OpenSSHPathPermission {
         failure that Test-OpenSSHStrictModesPath detects -- it strips the broad write grant
         instead of leaving StrictModes disabled.
 
-        Uses icacls under the hood. Replaces the Set-OpenSSHPermissions snippet.
+        Uses icacls under the hood.
 
     .PARAMETER Path
         The path to clean (for example a ChrootDirectory root such as "D:\").
@@ -31,7 +31,7 @@ function Repair-OpenSSHPathPermission {
         Credential used when connecting with -ComputerName.
 
     .EXAMPLE
-        Repair-OpenSSHPathPermission -Path D:\ -Recurse -ComputerName coltst19xfer
+        Repair-OpenSSHPathPermission -Path D:\ -Recurse -ComputerName server01
 
     .EXAMPLE
         Repair-OpenSSHPathPermission -Path 'D:\AU\Data' -Identity 'DOMAIN\SomeGroup' -Recurse -WhatIf

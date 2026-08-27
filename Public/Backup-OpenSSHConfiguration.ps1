@@ -9,8 +9,6 @@ function Backup-OpenSSHConfiguration {
         pointing this at a remote computer backs up that computer's configuration onto
         that computer.
 
-        Replaces the Copy-SSHConfigBackup snippet.
-
     .PARAMETER Path
         Source directory to back up. Defaults to "$env:ProgramData\ssh".
 

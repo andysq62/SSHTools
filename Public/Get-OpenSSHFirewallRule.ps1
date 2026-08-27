@@ -11,8 +11,6 @@ function Get-OpenSSHFirewallRule {
         match the machine's active connection profile (for example a Private-only rule on a
         DomainAuthenticated NIC) -- the Profiles column is what makes that visible.
 
-        Replaces the Get-SSHFirewallRule and Get-OpenSSHFirewallProfile snippets.
-
     .PARAMETER DisplayName
         Wildcard pattern matched against the rule display name. Defaults to "*OpenSSH*".
 
@@ -26,7 +24,7 @@ function Get-OpenSSHFirewallRule {
         Credential used when connecting with -ComputerName.
 
     .EXAMPLE
-        Get-OpenSSHFirewallRule -ComputerName coltst19xfer
+        Get-OpenSSHFirewallRule -ComputerName server01
 
     .EXAMPLE
         Get-OpenSSHFirewallRule -DisplayName 'OpenSSH SSH Server*'
